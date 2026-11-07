@@ -13,7 +13,7 @@ const CONFIG = {
   familyName: "Khare",
   warmth: ["Mrs. Archana Khare"],                                  // "With warmth & affection"
   seek: ["Mr. Yash Khare & Mrs. Tulika Shrivastava", "Mr. Rakesh & Mrs. Rita Khare", "Mr. Akhilesh & Mrs. Neeta Khare", "Mr. Apoorv Khare"],      // "We humbly seek your gracious presence..."
-  venue: "Pushpa Vatika Resort & Lawns", address: "Pushpa Vatika Resort & Lawns, Panvel, Navi Mumbai",
+  venue: "Pushp Vatika Resort & Lawns", address: "Pushp Vatika Resort & Lawns, Panvel, Navi Mumbai",
   events: [
     { day: 1, cls: "haldi",   icon: "🌼", name: "Haldi",       tag: "The Golden Hour",       date: "Saturday, 27 February 2027", time: "11:30 AM onwards" },
     { day: 1, cls: "sangeet", icon: "🎶", name: "Sangeet",     tag: "The Rhythm Soirée",     date: "Saturday, 27 February 2027", time: "7:00 PM onwards" },
