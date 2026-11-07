@@ -1,1 +1,154 @@
-<p>Hello World</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wedding Invitation · 27 & 28 February 2027</title>
+<meta name="theme-color" content="#F4DAD8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="locked">
+
+<!-- Background video: one file, muted, looping. Poster shows if it fails. -->
+<video id="bgVideo" class="bg-video" autoplay muted loop playsinline preload="metadata" poster="assets/wedding-poster.jpg" aria-hidden="true">
+  <source src="assets/wedding-video.mp4" type="video/mp4">
+</video>
+<div class="veil" aria-hidden="true"></div>
+<div id="petals" aria-hidden="true"></div>
+<audio id="music" src="song.mp3" loop preload="none"></audio>
+
+<!-- ===== Opening envelope ===== -->
+<div id="intro" class="intro">
+  <p class="intro-top">A Celebration of Love</p>
+  <button id="envelope" class="env" type="button" aria-label="Open your wedding invitation">
+    <span class="card"><span class="script">You’re Invited!</span><small>[Bride] &amp; [Groom]</small></span>
+    <span class="pocket"></span>
+    <span class="flap"></span>
+    <span class="seal"><b data-initials>B &amp; G</b></span>
+  </button>
+  <p class="intro-hint">Tap to Open Your Invitation</p>
+</div>
+
+<!-- ===== Navigation ===== -->
+<header id="nav" class="nav">
+  <a class="brand script" href="#home" data-initials-text>B &amp; G</a>
+  <button id="menuBtn" class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menu"><span></span><span></span><span></span></button>
+  <nav id="menu" class="menu" aria-label="Main">
+    <a href="#home">Home</a><a href="#countdown">Countdown</a><a href="#save-date">Save the Date</a>
+    <a href="#functions">Functions</a><a href="#family">Family</a><a href="#guests">Guests</a>
+    <a href="#venue">Venue</a><a href="#rsvp">RSVP</a>
+  </nav>
+</header>
+
+<!-- Sound controls (fixed, bottom corner) -->
+<div class="sound">
+  <button id="musicBtn" type="button" aria-pressed="false" aria-label="Play background music" title="Music">♪</button>
+  <button id="vidSoundBtn" type="button" aria-pressed="false" aria-label="Unmute video" title="Video sound">🔇</button>
+</div>
+
+<main id="main">
+
+<section id="home" class="hero">
+  <p class="lead">Together with our families, we invite you to celebrate our wedding.</p>
+  <h1 class="names script"><span data-bride>Nidhi</span><i>&amp;</i><span data-groom>Shreeyash</span></h1>
+  <p class="date-line">27 &amp; 28 February 2027</p>
+  <p class="sub">Two hearts, one beautiful journey, and a lifetime of togetherness.</p>
+  <a class="scroll-ind" href="#countdown" aria-label="Scroll to explore"><span></span></a>
+</section>
+
+<section id="invite" class="panel center invite">
+  <p class="reveal">With a prayer in our hearts,<br>God’s grace above us,<br>and the blessings of our beloved grandparents,</p>
+  <p class="nm script reveal" data-grand>[Dada &amp; Dadi Names]</p>
+  <p class="reveal">we begin a beautiful new chapter.<br>With immense joy and happiness,<br>we invite you to be a part of the wedding celebrations of</p>
+  <p class="nm script big reveal" data-bride>Nidhi</p>
+  <p class="par reveal" data-bparents>[Bride’s Parents’ Names]</p>
+  <p class="weds reveal">weds</p>
+  <p class="nm script big reveal" data-groom>Shreeyash</p>
+  <p class="par reveal" data-gparents>[Groom’s Parents’ Names]</p>
+  <p class="reveal">As they step gracefully into a new chapter of life, we invite you to share in the joy of their union and celebrate the timeless bonds of love, family, tradition, and togetherness.</p>
+</section>
+
+<section id="countdown" class="panel center">
+  <h2>The Countdown to Forever Begins</h2>
+  <div id="timer" class="timer" role="timer" aria-live="off">
+    <div class="tbox"><b id="cd-d">00</b><span>Days</span></div>
+    <div class="tbox"><b id="cd-h">00</b><span>Hours</span></div>
+    <div class="tbox"><b id="cd-m">00</b><span>Minutes</span></div>
+    <div class="tbox"><b id="cd-s">00</b><span>Seconds</span></div>
+  </div>
+  <p id="cd-done" class="script done-msg" hidden>Today, we begin forever. Thank you for being here!</p>
+</section>
+
+<section id="save-date" class="panel center">
+  <h2>Scratch to Reveal Our Special Dates</h2>
+  <p class="muted">A little surprise awaits you. Scratch to discover our special days!</p>
+  <div class="scratch-card gold-card">
+    <div class="under"><small>Save the Date</small><strong class="script">27th &amp; 28th February 2027</strong><p>Two days. Four celebrations. A lifetime of memories.</p></div>
+    <canvas class="cover" data-style="gold" aria-label="Scratch area. Drag to reveal the wedding dates."></canvas>
+  </div>
+  <button class="ghost reset" type="button" data-reset hidden>Scratch again</button>
+</section>
+
+<section id="functions" class="panel">
+  <h2 class="center">Wedding Functions</h2>
+  <div id="eventList" class="events"></div>
+</section>
+
+<section id="message" class="panel center">
+  <h2>A Little Message From Us</h2>
+  <p class="muted">Scratch to reveal a little something special!</p>
+  <div class="scratch-card sage-card">
+    <div class="under"><p class="msg">Your presence will make our special day even more beautiful. We can’t wait to celebrate this new chapter of our lives with you!</p></div>
+    <canvas class="cover" data-style="sage" aria-label="Scratch area. Drag to reveal our message."></canvas>
+  </div>
+  <button class="ghost reset" type="button" data-reset hidden>Scratch again</button>
+</section>
+
+<section id="family" class="panel center">
+  <p class="lead2 reveal">With hearts filled with love, gratitude &amp; joy.</p>
+  <h2 id="famTitle" class="reveal">The Khare Family invites you to celebrate</h2>
+  <p class="tagline reveal">Two Hearts • Two Families • One Beautiful Beginning</p>
+  <p class="muted reveal">A celebration of love, family &amp; togetherness.</p>
+  <div class="fam reveal"><h3>With warmth &amp; affection</h3><ul id="warmList"></ul></div>
+  <div class="fam reveal"><h3 class="long">We humbly seek your gracious presence and heartfelt blessings.</h3><ul id="seekList"></ul></div>
+</section>
+
+<section id="guests" class="panel center">
+  <h2>Guests Joining Us</h2>
+  <p class="muted">Friends and family who have said yes so far.</p>
+  <ul id="guestList" class="guests"></ul>
+  <p id="guestEmpty" class="muted" hidden>Be the first to RSVP below!</p>
+</section>
+
+<section id="venue" class="panel">
+  <h2 class="center">Venue &amp; Directions</h2>
+  <div id="venueList" class="venues"></div>
+</section>
+
+<section id="rsvp" class="panel center">
+  <h2>Will You Join Us?</h2>
+  <form id="rsvpForm" class="form" novalidate>
+    <label>Guest name *<input name="name" autocomplete="name" required><em class="err" data-for="name"></em></label>
+    <label>Phone or email (optional)<input name="contact" autocomplete="email"><em class="err" data-for="contact"></em></label>
+    <label>Number of guests *<input name="guests" type="number" min="1" max="20" value="1" required><em class="err" data-for="guests"></em></label>
+    <fieldset><legend>Attendance *</legend>
+      <label class="radio"><input type="radio" name="attend" value="accept"> Joyfully Accept</label>
+      <label class="radio"><input type="radio" name="attend" value="decline"> Regretfully Decline</label>
+      <em class="err" data-for="attend"></em>
+    </fieldset>
+    <label>Message to the couple (optional)<textarea name="note" rows="3"></textarea></label>
+    <button class="btn" type="submit">Send RSVP</button>
+    <p class="muted small">Demo only: responses are not stored. Saving RSVPs permanently needs a backend, database, or a form service.</p>
+  </form>
+  <div id="rsvpOk" class="ok" hidden tabindex="-1"><h3 class="script">Thank you!</h3><p id="rsvpMsg"></p></div>
+</section>
+
+<footer class="foot"><span class="script" data-couple>[Bride] &amp; [Groom]</span><br>27 &amp; 28 February 2027</footer>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
