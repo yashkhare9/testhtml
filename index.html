@@ -18,7 +18,7 @@
 </video>
 <div class="veil" aria-hidden="true"></div>
 <div id="petals" aria-hidden="true"></div>
-<audio id="music" src="song.mp3" loop preload="none"></audio>
+<audio id="music" src="song.mp4" loop preload="none"></audio>
 
 <!-- ===== Opening envelope ===== -->
 <div id="intro" class="intro">
@@ -27,17 +27,76 @@
     <span class="card"><span class="script">You’re Invited!</span><small>[Bride] &amp; [Groom]</small></span>
     <span class="pocket"></span>
     <span class="flap"></span>
-    <span class="seal"><b data-initials>B &amp; G</b></span>
+    <span class="seal"><img src='logo.png'></span>
   </button>
   <p class="intro-hint">Tap to Open Your Invitation</p>
 </div>
+
+<!-- ===== Cinematic opening scene (plays right after the envelope opens) ===== -->
+<section id="film" class="film" hidden aria-label="Wedding invitation opening">
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <button id="filmSkip" class="film-skip" type="button">Skip &rsaquo;</button>
+
+  <div class="f-invite">
+    <p class="f-script script"><span>You are invited</span></p>
+    <p class="f-sub">To celebrate our wedding</p>
+  </div>
+
+  <div class="f-names">
+    <p class="f-of">The Wedding of</p>
+    <h2 class="f-title"><span data-bride></span> &amp;<br><span data-groom></span></h2>
+    <p class="f-date">27 &amp; 28 February 2027</p>
+  </div>
+
+  <div class="f-scene" aria-hidden="true">
+    <div class="f-beam"></div>
+    <div class="f-floor"></div>
+    <div class="f-ring"></div>
+    <div class="f-couple" id="fCouple">
+      <svg viewBox="0 0 220 280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gGown" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFBF7"/><stop offset=".6" stop-color="#F6E4DE"/><stop offset="1" stop-color="#D9B9B4"/></linearGradient>
+          <linearGradient id="gSuit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#23212D"/><stop offset="1" stop-color="#0B0A10"/></linearGradient>
+        </defs>
+        <!-- groom -->
+        <g transform="translate(11 0)"><path d="M108 252V176h14v76zM126 252V176h14v76z" fill="#0C0B11"/>
+        <path d="M110 82c6-9 24-9 30 0 4 18 4 62 2 96h-34c-2-34-2-78 2-96z" fill="url(#gSuit)"/>
+        <path d="M122 84l5 22 5-22z" fill="#F4EDE6"/>
+        <circle cx="128" cy="64" r="12.5" fill="#E7C2A8"/>
+        <path d="M115 62c0-12 9-18 17-15 8 3 10 12 9 18-4-6-9-8-14-8-5 0-9 2-12 5z" fill="#1C1416"/></g>
+        <!-- bride -->
+        <g class="gown"><path d="M94 122C74 152 44 200 8 240c48 28 156 28 204 0-30-34-58-86-82-118z" fill="url(#gGown)"/>
+        <path d="M94 122c10 46 4 96-10 132M130 122c4 50 18 96 40 128" stroke="#C9A59F" stroke-opacity=".35" stroke-width="1.4" fill="none"/></g>
+        <path d="M92 90c-4 12-3 22 2 34h38c3-12 2-22-4-34z" fill="url(#gGown)"/>
+        <path d="M134 94l-14-10" stroke="#F6E4DE" stroke-width="8" stroke-linecap="round"/>
+        <path d="M130 100c8 6 8 16 2 22" stroke="#15131C" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <circle cx="108" cy="68" r="12" fill="#EFCDB8"/>
+        <path d="M96 66c-2-12 6-20 16-19 8 1 12 8 11 15-3-5-8-8-14-7-5 1-9 5-13 11z" fill="#3A2420"/>
+        <circle cx="97" cy="52" r="6.5" fill="#3A2420"/>
+      </svg>
+    </div>
+    <div class="bf-fly">
+      <div class="bf">
+        <svg viewBox="0 0 60 50" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="gWing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F7B9CE"/></linearGradient></defs>
+          <g class="wl"><path d="M29 24C18 4 1 5 3 18c1 9 15 12 26 9z" fill="url(#gWing)"/><path d="M29 28C19 29 9 36 13 44c6 5 14-6 16-14z" fill="url(#gWing)" opacity=".9"/></g>
+          <g class="wr"><path d="M31 24C42 4 59 5 57 18c-1 9-15 12-26 9z" fill="url(#gWing)"/><path d="M31 28c10 1 20 8 16 16-6 5-14-6-16-14z" fill="url(#gWing)" opacity=".9"/></g>
+          <ellipse cx="30" cy="27" rx="1.7" ry="10" fill="#6B3A4B"/>
+          <path d="M29.5 17Q26 9 22 8M30.5 17Q34 9 38 8" stroke="#6B3A4B" stroke-width=".9" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <button id="filmEnter" class="f-enter" type="button">Open Invitation</button>
+</section>
 
 <!-- ===== Navigation ===== -->
 <header id="nav" class="nav">
   <a class="brand script" href="#home" data-initials-text>B &amp; G</a>
   <button id="menuBtn" class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menu"><span></span><span></span><span></span></button>
   <nav id="menu" class="menu" aria-label="Main">
-    <a href="#home">Home</a><a href="#countdown">Countdown</a><a href="#save-date">Save the Date</a>
+    <a href="#home">Home</a><a href="#save-date">Save the Date</a><a href="#countdown" id="navCd" hidden>Countdown</a>
     <a href="#functions">Functions</a><a href="#family">Family</a><a href="#guests">Guests</a>
     <a href="#venue">Venue</a><a href="#rsvp">RSVP</a>
   </nav>
@@ -46,7 +105,7 @@
 <!-- Sound controls (fixed, bottom corner) -->
 <div class="sound">
   <button id="musicBtn" type="button" aria-pressed="false" aria-label="Play background music" title="Music">♪</button>
-  <button id="vidSoundBtn" type="button" aria-pressed="false" aria-label="Unmute video" title="Video sound">🔇</button>
+  <button id="vidSoundBtn" type="button" aria-pressed="false" aria-label="Unmute video" title="Video sound" style="display:none">🔇</button>
 </div>
 
 <main id="main">
@@ -71,7 +130,17 @@
   <p class="reveal">As they step gracefully into a new chapter of life, we invite you to share in the joy of their union and celebrate the timeless bonds of love, family, tradition, and togetherness.</p>
 </section>
 
-<section id="countdown" class="panel center">
+<section id="save-date" class="panel center">
+  <h2>Scratch to Reveal Our Special Dates</h2>
+  <p class="muted">A little surprise awaits you. Scratch to discover our special days!</p>
+  <div class="scratch-card gold-card">
+    <div class="under"><small>Save the Date</small><strong class="script">27th &amp; 28th February 2027</strong><p><!---Two days. Four celebrations.---> A lifetime of memories.</p></div>
+    <canvas class="cover" data-style="gold" aria-label="Scratch area. Drag to reveal the wedding dates."></canvas>
+  </div>
+  <button class="ghost reset" type="button" data-reset hidden>Scratch again</button>
+</section>
+
+<section id="countdown" class="panel center" hidden>
   <h2>The Countdown to Forever Begins</h2>
   <div id="timer" class="timer" role="timer" aria-live="off">
     <div class="tbox"><b id="cd-d">00</b><span>Days</span></div>
@@ -80,16 +149,6 @@
     <div class="tbox"><b id="cd-s">00</b><span>Seconds</span></div>
   </div>
   <p id="cd-done" class="script done-msg" hidden>Today, we begin forever. Thank you for being here!</p>
-</section>
-
-<section id="save-date" class="panel center">
-  <h2>Scratch to Reveal Our Special Dates</h2>
-  <p class="muted">A little surprise awaits you. Scratch to discover our special days!</p>
-  <div class="scratch-card gold-card">
-    <div class="under"><small>Save the Date</small><strong class="script">27th &amp; 28th February 2027</strong><p>Two days. Four celebrations. A lifetime of memories.</p></div>
-    <canvas class="cover" data-style="gold" aria-label="Scratch area. Drag to reveal the wedding dates."></canvas>
-  </div>
-  <button class="ghost reset" type="button" data-reset hidden>Scratch again</button>
 </section>
 
 <section id="functions" class="panel">
@@ -112,8 +171,9 @@
   <h2 id="famTitle" class="reveal">The Khare Family invites you to celebrate</h2>
   <p class="tagline reveal">Two Hearts • Two Families • One Beautiful Beginning</p>
   <p class="muted reveal">A celebration of love, family &amp; togetherness.</p>
-  <div class="fam reveal"><h3>With warmth &amp; affection</h3><ul id="warmList"></ul></div>
-  <div class="fam reveal"><h3 class="long">We humbly seek your gracious presence and heartfelt blessings.</h3><ul id="seekList"></ul></div>
+  
+  <div class="fam reveal"><h3 class="long">We humbly seek your gracious presence and heartfelt blessings.</h3><h3 style="">With warmth &amp; affection</h3><ul id="seekList"></ul></div>
+  <div class="fam reveal"><ul id="warmList"></ul></div>
 </section>
 
 <section id="guests" class="panel center">

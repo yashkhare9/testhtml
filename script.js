@@ -7,12 +7,12 @@ const CONFIG = {
   // Names of guests who have confirmed. Add them here (comma-separated) to show them to everyone.
   confirmedGuests: [],
   // Names in the invitation text (replace the placeholders)
-  grandparents: "Lt. Smt. Kamla & Lt. Shri I. B. Khare",
+  grandparents: "Lt. Smt. Kamla & Lt. Shri I.B. Khare",
   brideParents: "Daughter of Smt. Archana & Lt. Shri Yogesh Khare", groomParents: "Son of Smt. Pallavi & Shri Sanjay Nage",
   // Closing family section
   familyName: "Khare",
-  warmth: ["Mrs. Archana Khare"],                                  // "With warmth & affection"
-  seek: ["Mr. Yash Khare & Mrs. Tulika Shrivastava", "Mr. Rakesh & Mrs. Rita Khare", "Mr. Akhilesh & Mrs. Neeta Khare", "Mr. Apoorv Khare"],      // "We humbly seek your gracious presence..."
+  warmth: [""],                                  // "With warmth & affection"
+  seek: ["Mrs. Archana Khare", "Mr. Yash Khare & Mrs. Tulika Shrivastava", "Mr. Rakesh & Mrs. Rita Khare", "Mr. Akhilesh & Mrs. Neeta Khare", "Mr. Apoorv Khare"],      // "We humbly seek your gracious presence..."
   venue: "Pushp Vatika Resort & Lawns", address: "Pushp Vatika Resort & Lawns, Panvel, Navi Mumbai",
   events: [
     { day: 1, cls: "haldi",   icon: "🌼", name: "Haldi",       tag: "The Golden Hour",       date: "Saturday, 27 February 2027", time: "11:30 AM onwards" },
@@ -60,10 +60,46 @@ const CONFIG = {
     env.classList.add("open"); env.disabled = true;
     startMusic();
     setTimeout(() => {
-      intro.classList.add("done"); document.body.classList.remove("locked"); $$("#main .reveal").forEach(observe);
+      intro.classList.add("done"); startFilm();           // cinematic scene plays next; the site unlocks when it ends
       setTimeout(() => { intro.hidden = true; }, 1100);
     }, reduce ? 300 : 2300);
   });
+
+  /* ---------- Cinematic opening scene: starfield > "You are invited" > names > butterfly + couple ---------- */
+  const film = $("#film"), starCv = $("#stars"); let filmOn = false, starRaf = 0, filmTimers = [], onResize = null;
+  function drawStars() {
+    const ctx = starCv.getContext("2d"), d = Math.min(devicePixelRatio || 1, 2); let w, h, S = [];
+    const size = () => {
+      w = starCv.width = innerWidth * d; h = starCv.height = innerHeight * d;
+      S = Array.from({ length: Math.round(innerWidth * innerHeight / 3800) }, () => ({ x: Math.random() * w, y: Math.random() * h, r: (Math.random() * 1.4 + .3) * d, p: Math.random() * 6.28, s: .6 + Math.random() * 1.6, v: (Math.random() * .12 + .02) * d }));
+    };
+    size(); onResize = size; addEventListener("resize", onResize);
+    const frame = t => {
+      ctx.clearRect(0, 0, w, h); ctx.fillStyle = "#FFF4DC";
+      for (const s of S) {
+        if (!reduce) { s.y += s.v; if (s.y > h) s.y = 0; }
+        ctx.globalAlpha = .25 + .75 * Math.abs(Math.sin(t / 1000 * s.s + s.p));
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill();
+      }
+      if (!reduce) starRaf = requestAnimationFrame(frame);
+    };
+    frame(0);
+  }
+  function startFilm() {
+    filmOn = true; film.hidden = false; document.body.classList.add("filming");
+    drawStars(); void film.offsetWidth; film.classList.add("on");
+    const steps = [[0, "t1"], [5600, "t2"], [7200, "t3"], [9200, "t4"], [12000, "t5"]];   // ms from scene start
+    steps.forEach(([ms, c]) => reduce ? film.classList.add(c) : filmTimers.push(setTimeout(() => film.classList.add(c), ms)));
+  }
+  function endFilm() {
+    if (!filmOn) return; filmOn = false; filmTimers.forEach(clearTimeout);
+    film.classList.add("done"); document.body.classList.remove("locked", "filming");
+    scrollTo(0, 0); $$("#main .reveal").forEach(observe);          // original hand-off: invitation content unlocks
+    setTimeout(() => { film.hidden = true; cancelAnimationFrame(starRaf); removeEventListener("resize", onResize); }, 1300);
+  }
+  $("#filmEnter").addEventListener("click", endFilm);
+  $("#filmSkip").addEventListener("click", endFilm);
+
 
   /* Sound controls */
   const mBtn = $("#musicBtn"), vBtn = $("#vidSoundBtn");
@@ -134,8 +170,15 @@ const CONFIG = {
       for (let i = 3; i < px.length; i += 64) { total++; if (px[i] < 128) clear++; }   // sample every 16th pixel
       if (clear / total >= .4) finish();
     }
-    function finish() { done = true; drawing = false; cv.classList.add("gone"); confetti(card); if (reset) reset.hidden = false; }
+    function finish() { done = true; drawing = false; cv.classList.add("gone"); confetti(card); if (reset) reset.hidden = false; card.dispatchEvent(new CustomEvent("scratched", { bubbles: true })); }
     reset && reset.addEventListener("click", () => { done = started = false; cv.classList.remove("gone"); size(); reset.hidden = true; });
+  });
+
+  /* Scratching the save-the-date card unlocks the countdown right below it */
+  $("#save-date").addEventListener("scratched", () => {
+    const sec = $("#countdown"); if (!sec.hidden) return;
+    sec.hidden = false; $("#navCd").hidden = false; sec.classList.add("cd-in");
+    setTimeout(() => sec.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" }), reduce ? 0 : 900);
   });
 
   /* Family names */
@@ -150,16 +193,8 @@ const CONFIG = {
   const svg = (bg1, bg2, body) => `<svg viewBox="0 0 120 64" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${body}</svg>`;
   const note = (x, y, c) => `<g fill="${c}"><ellipse cx="${x}" cy="${y}" rx="4.5" ry="3.3" transform="rotate(-20 ${x} ${y})"/><rect x="${x + 3.3}" y="${y - 17}" width="1.8" height="17"/><path d="M${x + 5} ${y - 17}q6 2 5 8q-2-4-5-4z"/></g>`;
   const ICONS = {
-    haldi: svg("#FFE27A", "#F5A623",
-      sag(13, 6, 114, 6, 9, (x, y, i) => bloom(x, y, 4.2, i % 2 ? "#FF9F1C" : "#FFC107", "#E4541B")) +
-      `<ellipse cx="60" cy="55" rx="32" ry="6" fill="#8C5A12"/><ellipse cx="60" cy="52" rx="32" ry="6" fill="#E8B04A"/><ellipse cx="60" cy="51" rx="26" ry="4.5" fill="#C98A1A"/>` +
-      `<path d="M36 51Q60 18 84 51Z" fill="#F2B705"/><path d="M44 49Q60 26 76 49Z" fill="#FFD34D"/>` +
-      bloom(18, 50, 5, "#FF9F1C", "#E4541B") + bloom(102, 50, 5, "#FFC107", "#E4541B")),
-    sangeet: svg("#3B1A6E", "#B0388F",
-      `<path d="M0 12Q30 26 60 12T120 12" stroke="#5B1F4E" stroke-width="1.2" fill="none"/>` +
-      sag(11, 4, 116, 14, 6, (x, y) => `<circle cx="${x}" cy="${y}" r="6" fill="#FFC107" opacity=".35"/><circle cx="${x}" cy="${y}" r="2.8" fill="#F2A900"/>`) +
-      note(36, 54, "#7B2CBF") + note(62, 48, "#E0457B") + note(86, 54, "#0E7C86") +
-      `<g fill="#F2A900"><path d="M14 34l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/><path d="M106 30l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z"/></g>`),
+    haldi: '<img src="haldi_image.gif">',
+    sangeet: '<img src="sangeet_image.gif">',
     phere: svg("#FFD7A8", "#E4541B",
       `<path d="M14 24Q60 -2 106 24Z" fill="#B8324A"/><path d="M14 24H106" stroke="#F2A900" stroke-width="3"/>` +
       sag(9, 20, 100, 24, 0, x => `<path d="M${x} 24v7" stroke="#F2A900" stroke-width="1.4"/>${bloom(x, 33, 2.6, "#FFC107", "#E4541B")}`) +
