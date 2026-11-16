@@ -1,48 +1,40 @@
 /* ===================== CONFIG: edit these ===================== */
 const CONFIG = {
-  bride: "Nidhi", groom: "Shreeyash", initials: "N & S",
-  // Countdown target, fixed to IST (UTC+05:30) so it is right in any timezone
-  target: "2027-02-28T11:30:00+05:30",
-  // Fill venue + address; "Get Directions" then opens Google Maps for that address
-  // Names of guests who have confirmed. Add them here (comma-separated) to show them to everyone.
-  confirmedGuests: [],
-  // Names in the invitation text (replace the placeholders)
+  bride: "Nidhi", groom: "Shreeyash",
+  target: "2027-02-28T11:30:00+05:30",            // countdown target (IST)
   grandparents: "Lt. Smt. Kamla & Lt. Shri I.B. Khare",
-  brideParents: "Daughter of Smt. Archana & Lt. Shri Yogesh Khare", groomParents: "Son of Smt. Pallavi & Shri Sanjay Nage",
-  // Closing family section
+  brideParents: "Daughter of Smt. Archana & Lt. Shri Yogesh Khare",
+  groomParents: "Son of Smt. Pallavi & Shri Sanjay Nage",
   familyName: "Khare",
-  warmth: [""],                                  // "With warmth & affection"
-  seek: ["Mrs. Archana Khare", "Mr. Yash Khare & Mrs. Tulika Shrivastava", "Mr. Rakesh & Mrs. Rita Khare", "Mr. Akhilesh & Mrs. Neeta Khare", "Mr. Apoorv Khare"],      // "We humbly seek your gracious presence..."
+  warmth: [],
+  seek: ["Mrs. Archana Khare", "Mr. Yash Khare & Mrs. Tulika Shrivastava", "Mr. Rakesh & Mrs. Rita Khare", "Mr. Akhilesh & Mrs. Neeta Khare", "Mr. Apoorv Khare"],
   venue: "Pushp Vatika Resort & Lawns", address: "Pushp Vatika Resort & Lawns, Panvel, Navi Mumbai",
+  // img = poster image shown on the card (the title is already printed on each poster)
   events: [
-    { day: 1, cls: "haldi",   icon: "🌼", name: "Haldi",       tag: "The Golden Hour",       date: "Saturday, 27 February 2027", time: "11:30 AM onwards" },
-    { day: 1, cls: "sangeet", icon: "🎶", name: "Sangeet",     tag: "The Rhythm Soirée",     date: "Saturday, 27 February 2027", time: "7:00 PM onwards" },
-    { day: 2, cls: "phere",   icon: "🪔", name: "Phere",       tag: "The Forever Chapter",   date: "Sunday, 28 February 2027",   time: "9:00 AM onwards" },
-    { day: 2, cls: "mangal",  icon: "🌺", name: "Mangalashtak", tag: "The Floral Promise",    date: "Sunday, 28 February 2027",   time: "11:30 AM" }
+    { day: 1, cls: "haldi",   name: "Haldi",       img: "haldi_im.png",        tag: "The Golden Hour",     date: "Saturday, 27 February 2027", time: "11:30 AM onwards" },
+    { day: 1, cls: "sangeet", name: "Sangeet",     img: "sangeet_im.jpeg",      tag: "The Rhythm Soirée",   date: "Saturday, 27 February 2027", time: "7:00 PM onwards" },
+    { day: 2, cls: "phere",   name: "Phere",       img: "phere_im.png",        tag: "The Forever Chapter", date: "Sunday, 28 February 2027",   time: "9:00 AM onwards" },
+    { day: 2, cls: "mangal",  name: "Mangalashtak", img: "mangalashtak_im.jpeg", tag: "The Floral Promise",  date: "Sunday, 28 February 2027",   time: "11:30 AM" }
   ]
 };
 /* ================================================================ */
 (() => {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const video = $("#bgVideo"), music = $("#music");
+  const music = $("#music"), body = document.body;
 
-  /* Names / initials */
+  /* Fill text from CONFIG */
   $$("[data-bride]").forEach(e => e.textContent = CONFIG.bride);
   $$("[data-groom]").forEach(e => e.textContent = CONFIG.groom);
-  $$("[data-initials],[data-initials-text]").forEach(e => e.textContent = CONFIG.initials);
-  $("[data-grand]").textContent = CONFIG.grandparents; $("[data-bparents]").textContent = CONFIG.brideParents; $("[data-gparents]").textContent = CONFIG.groomParents;
   $$("[data-couple]").forEach(e => e.textContent = CONFIG.bride + " & " + CONFIG.groom);
-  $(".card small").textContent = CONFIG.bride + " & " + CONFIG.groom;
+  $("[data-grand]").textContent = CONFIG.grandparents;
+  $("[data-bparents]").textContent = CONFIG.brideParents;
+  $("[data-gparents]").textContent = CONFIG.groomParents;
+  $("#famTitle").textContent = `The ${CONFIG.familyName} Family invites you to celebrate`;
+  const li = a => a.filter(Boolean).map(n => `<li>${n}</li>`).join("");
+  $("#warmList").innerHTML = li(CONFIG.warmth); $("#seekList").innerHTML = li(CONFIG.seek);
 
-  /* Video: try autoplay muted; poster/gradient stays if blocked or missing */
-  const tryPlay = () => video.play && video.play().catch(() => {});
-  tryPlay();
-  video.addEventListener("error", () => video.removeAttribute("src"), true);
-  $("source", video).addEventListener("error", () => { video.style.opacity = 0; });
-  addEventListener("pointerdown", () => { if (video.paused) tryPlay(); }, { once: true });
-
-  /* Petals (few, paused when tab hidden) */
+  /* Petals */
   if (!reduce) {
     const box = $("#petals"), n = innerWidth < 600 ? 9 : 16;
     for (let i = 0; i < n; i++) {
@@ -51,81 +43,63 @@ const CONFIG = {
       box.appendChild(p);
     }
   }
-  document.addEventListener("visibilitychange", () => document.body.classList.toggle("paused", document.hidden));
+  document.addEventListener("visibilitychange", () => body.classList.toggle("paused", document.hidden));
 
-  /* Envelope: opens once */
-  const env = $("#envelope"), intro = $("#intro"); let opened = false;
+  /* Music */
+  const mBtn = $("#musicBtn");
+  const setMusic = on => { mBtn.setAttribute("aria-pressed", on); mBtn.setAttribute("aria-label", on ? "Pause background music" : "Play background music"); mBtn.textContent = on ? "♫" : "♪"; };
+  const startMusic = () => music.play().then(() => setMusic(true)).catch(() => setMusic(false));
+  mBtn.addEventListener("click", () => { if (music.paused) startMusic(); else { music.pause(); setMusic(false); } });
+  music.addEventListener("error", () => setMusic(false));
+
+  /* ===== Flow: envelope -> "You are invited" -> video -> invitation ===== */
+  const env = $("#envelope"), intro = $("#intro"), invited = $("#invited"), film = $("#film"), vid = $("#introVideo");
+  let opened = false, invTimer = 0, filmTimers = [], stage = "envelope";
+
   env.addEventListener("click", () => {
     if (opened) return; opened = true;
-    env.classList.add("open"); env.disabled = true;
-    startMusic();
-    setTimeout(() => {
-      intro.classList.add("done"); startFilm();           // cinematic scene plays next; the site unlocks when it ends
-      setTimeout(() => { intro.hidden = true; }, 1100);
-    }, reduce ? 300 : 2300);
+    env.classList.add("open"); env.disabled = true; startMusic();
+    setTimeout(() => { intro.classList.add("done"); startInvited(); setTimeout(() => { intro.hidden = true; }, 1100); }, reduce ? 300 : 2300);
   });
 
-  /* ---------- Cinematic opening scene: starfield > "You are invited" > names > butterfly + couple ---------- */
-  const film = $("#film"), starCv = $("#stars"); let filmOn = false, starRaf = 0, filmTimers = [], onResize = null;
-  function drawStars() {
-    const ctx = starCv.getContext("2d"), d = Math.min(devicePixelRatio || 1, 2); let w, h, S = [];
-    const size = () => {
-      w = starCv.width = innerWidth * d; h = starCv.height = innerHeight * d;
-      S = Array.from({ length: Math.round(innerWidth * innerHeight / 3800) }, () => ({ x: Math.random() * w, y: Math.random() * h, r: (Math.random() * 1.4 + .3) * d, p: Math.random() * 6.28, s: .6 + Math.random() * 1.6, v: (Math.random() * .12 + .02) * d }));
-    };
-    size(); onResize = size; addEventListener("resize", onResize);
-    const frame = t => {
-      ctx.clearRect(0, 0, w, h); ctx.fillStyle = "#FFF4DC";
-      for (const s of S) {
-        if (!reduce) { s.y += s.v; if (s.y > h) s.y = 0; }
-        ctx.globalAlpha = .25 + .75 * Math.abs(Math.sin(t / 1000 * s.s + s.p));
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill();
-      }
-      if (!reduce) starRaf = requestAnimationFrame(frame);
-    };
-    frame(0);
+  function startInvited() {
+    stage = "invited"; body.classList.add("inviting");
+    invited.hidden = false; void invited.offsetWidth; invited.classList.add("on");
+    invTimer = setTimeout(startFilm, reduce ? 1500 : 5200);       // auto-advance to the video
   }
+  $("#invitedSkip").addEventListener("click", startFilm);
+
   function startFilm() {
-    filmOn = true; film.hidden = false; document.body.classList.add("filming");
-    drawStars(); void film.offsetWidth; film.classList.add("on");
-    const steps = [[0, "t1"], [5600, "t2"], [7200, "t3"], [9200, "t4"], [12000, "t5"]];   // ms from scene start
-    steps.forEach(([ms, c]) => reduce ? film.classList.add(c) : filmTimers.push(setTimeout(() => film.classList.add(c), ms)));
+    if (stage !== "invited") return; stage = "film"; clearTimeout(invTimer);
+    body.classList.remove("inviting"); body.classList.add("filming");
+    film.hidden = false; void film.offsetWidth; film.classList.add("on");
+    vid.play().catch(() => {});
+    invited.classList.add("done"); setTimeout(() => { invited.hidden = true; }, 1200);
+    [[200, "t1"], [reduce ? 300 : 4500, "t2"]].forEach(([ms, c]) => filmTimers.push(setTimeout(() => film.classList.add(c), ms)));
   }
+
   function endFilm() {
-    if (!filmOn) return; filmOn = false; filmTimers.forEach(clearTimeout);
-    film.classList.add("done"); document.body.classList.remove("locked", "filming");
-    scrollTo(0, 0); $$("#main .reveal").forEach(observe);          // original hand-off: invitation content unlocks
-    setTimeout(() => { film.hidden = true; cancelAnimationFrame(starRaf); removeEventListener("resize", onResize); }, 1300);
+    if (stage !== "film") return; stage = "main"; filmTimers.forEach(clearTimeout);
+    film.classList.add("done"); body.classList.remove("locked", "filming");
+    scrollTo(0, 0); $$("#main .reveal").forEach(observe);
+    setTimeout(() => { film.hidden = true; vid.pause(); }, 1300);
   }
   $("#filmEnter").addEventListener("click", endFilm);
   $("#filmSkip").addEventListener("click", endFilm);
-
-
-  /* Sound controls */
-  const mBtn = $("#musicBtn"), vBtn = $("#vidSoundBtn");
-  function setMusic(on) { mBtn.setAttribute("aria-pressed", on); mBtn.setAttribute("aria-label", on ? "Pause background music" : "Play background music"); mBtn.textContent = on ? "♫" : "♪"; }
-  function startMusic() { music.play().then(() => setMusic(true)).catch(() => setMusic(false)); }
-  mBtn.addEventListener("click", () => { if (music.paused) startMusic(); else { music.pause(); setMusic(false); } });
-  music.addEventListener("error", () => setMusic(false));
-  vBtn.addEventListener("click", () => {
-    video.muted = !video.muted; const on = !video.muted;
-    vBtn.setAttribute("aria-pressed", on); vBtn.setAttribute("aria-label", on ? "Mute video" : "Unmute video"); vBtn.textContent = on ? "🔊" : "🔇";
-    if (on && !music.paused) { music.pause(); setMusic(false); }   // avoid two audio tracks at once
-    tryPlay();
-  });
 
   /* Nav */
   const menu = $("#menu"), menuBtn = $("#menuBtn");
   const closeMenu = () => { menu.classList.remove("show"); menuBtn.setAttribute("aria-expanded", false); };
   menuBtn.addEventListener("click", () => menuBtn.setAttribute("aria-expanded", menu.classList.toggle("show")));
   menu.addEventListener("click", e => { if (e.target.closest("a")) closeMenu(); });
+  addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
 
-  /* Countdown (clears itself at zero) */
+  /* Countdown */
   const target = new Date(CONFIG.target).getTime(), cd = { d: $("#cd-d"), h: $("#cd-h"), m: $("#cd-m"), s: $("#cd-s") };
   const set = (el, v) => { v = String(v).padStart(2, "0"); if (el.textContent !== v) { el.textContent = v; if (!reduce) { el.classList.remove("tick"); void el.offsetWidth; el.classList.add("tick"); } } };
   const timerId = setInterval(tickCd, 1000); tickCd();
   function tickCd() {
-    let t = Math.max(0, target - Date.now());
+    const t = Math.max(0, target - Date.now());
     set(cd.d, Math.floor(t / 864e5)); set(cd.h, Math.floor(t / 36e5) % 24); set(cd.m, Math.floor(t / 6e4) % 60); set(cd.s, Math.floor(t / 1e3) % 60);
     if (t === 0) { clearInterval(timerId); $("#timer").hidden = true; $("#cd-done").hidden = false; }
   }
@@ -133,23 +107,23 @@ const CONFIG = {
   /* Confetti */
   function confetti(el) {
     if (reduce) return;
-    const r = el.getBoundingClientRect(), cols = ["#F2A900", "#E0457B", "#0E7C86", "#EF6C1A", "#7B2CBF"];
+    const r = el.getBoundingClientRect(), cols = ["#7A0F1A", "#B8872E", "#E6C77A", "#E8A317", "#C0394B"];
     for (let i = 0; i < 34; i++) {
       const c = document.createElement("i"); c.className = "confetti";
       c.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;background:${cols[i % 5]};--x:${Math.random() * 360 - 180}px;--y:${Math.random() * 300 - 200}px;--r:${Math.random() * 720}deg`;
-      document.body.appendChild(c); setTimeout(() => c.remove(), 1700);
+      body.appendChild(c); setTimeout(() => c.remove(), 1700);
     }
   }
 
-  /* Scratch cards (pointer events: mouse, touch, pen) */
+  /* Scratch cards */
   function paint(ctx, w, h, style) {
     const g = ctx.createLinearGradient(0, 0, w, h);
-    if (style === "gold") { g.addColorStop(0, "#E0A100"); g.addColorStop(.5, "#FFE08A"); g.addColorStop(1, "#E0457B"); }
-    else { g.addColorStop(0, "#2AA5AE"); g.addColorStop(.5, "#F8BBD0"); g.addColorStop(1, "#7B2CBF"); }
+    if (style === "gold") { g.addColorStop(0, "#B8872E"); g.addColorStop(.5, "#F3DC9B"); g.addColorStop(1, "#B8872E"); }
+    else { g.addColorStop(0, "#7A0F1A"); g.addColorStop(.5, "#B03040"); g.addColorStop(1, "#5A0A13"); }
     ctx.globalCompositeOperation = "source-over"; ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "rgba(255,255,255,.28)";
-    for (let i = 0; i < 90; i++) { ctx.beginPath(); ctx.arc(Math.random() * w, Math.random() * h, (style === "gold" ? 1.5 : 4) * (w / 400), 0, 7); ctx.fill(); }
-    ctx.fillStyle = "#4A1238"; ctx.textAlign = "center"; ctx.font = `600 ${w / 15}px Georgia,serif`;
+    ctx.fillStyle = "rgba(255,255,255,.25)";
+    for (let i = 0; i < 90; i++) { ctx.beginPath(); ctx.arc(Math.random() * w, Math.random() * h, (style === "gold" ? 1.5 : 3) * (w / 400), 0, 7); ctx.fill(); }
+    ctx.fillStyle = style === "gold" ? "#5A0A13" : "#F6E3B0"; ctx.textAlign = "center"; ctx.font = `600 ${w / 15}px Georgia,serif`;
     ctx.fillText(style === "gold" ? "✦ Scratch here ✦" : "Scratch to reveal", w / 2, h / 2 + w / 45);
   }
   $$(".scratch-card").forEach(card => {
@@ -167,90 +141,31 @@ const CONFIG = {
     ["pointerup", "pointercancel"].forEach(ev => cv.addEventListener(ev, () => { drawing = false; if (!done) check(); }));
     function check() {
       const px = ctx.getImageData(0, 0, w, h).data; let clear = 0, total = 0;
-      for (let i = 3; i < px.length; i += 64) { total++; if (px[i] < 128) clear++; }   // sample every 16th pixel
+      for (let i = 3; i < px.length; i += 64) { total++; if (px[i] < 128) clear++; }
       if (clear / total >= .4) finish();
     }
     function finish() { done = true; drawing = false; cv.classList.add("gone"); confetti(card); if (reset) reset.hidden = false; card.dispatchEvent(new CustomEvent("scratched", { bubbles: true })); }
     reset && reset.addEventListener("click", () => { done = started = false; cv.classList.remove("gone"); size(); reset.hidden = true; });
   });
-
-  /* Scratching the save-the-date card unlocks the countdown right below it */
   $("#save-date").addEventListener("scratched", () => {
     const sec = $("#countdown"); if (!sec.hidden) return;
     sec.hidden = false; $("#navCd").hidden = false; sec.classList.add("cd-in");
     setTimeout(() => sec.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" }), reduce ? 0 : 900);
   });
 
-  /* Family names */
-  $("#famTitle").textContent = `The ${CONFIG.familyName} Family invites you to celebrate`;
-  const li = a => a.map(n => `<li>${n}</li>`).join("");
-  $("#warmList").innerHTML = li(CONFIG.warmth); $("#seekList").innerHTML = li(CONFIG.seek);
-
-
-  /* Illustrated scene banners (inline SVG, no image files needed) */
-  const sag = (n, x0, x1, y0, dip, fn) => Array.from({ length: n }, (_, i) => { const t = i / (n - 1), x = x0 + (x1 - x0) * t; return fn(x, y0 + dip * Math.sin(Math.PI * t), i); }).join("");
-  const bloom = (x, y, r, a, b) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${a}"/><circle cx="${x}" cy="${y}" r="${r * .55}" fill="${b}"/>`;
-  const svg = (bg1, bg2, body) => `<svg viewBox="0 0 120 64" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${body}</svg>`;
-  const note = (x, y, c) => `<g fill="${c}"><ellipse cx="${x}" cy="${y}" rx="4.5" ry="3.3" transform="rotate(-20 ${x} ${y})"/><rect x="${x + 3.3}" y="${y - 17}" width="1.8" height="17"/><path d="M${x + 5} ${y - 17}q6 2 5 8q-2-4-5-4z"/></g>`;
-  const ICONS = {
-    haldi: '<img src="haldi_image.gif">',
-    sangeet: '<img src="sangeet_image.gif">',
-    phere: svg("#FFD7A8", "#E4541B",
-      `<path d="M14 24Q60 -2 106 24Z" fill="#B8324A"/><path d="M14 24H106" stroke="#F2A900" stroke-width="3"/>` +
-      sag(9, 20, 100, 24, 0, x => `<path d="M${x} 24v7" stroke="#F2A900" stroke-width="1.4"/>${bloom(x, 33, 2.6, "#FFC107", "#E4541B")}`) +
-      [22, 38, 82, 98].map(x => `<rect x="${x - 2}" y="26" width="4" height="30" fill="#F2C766"/><rect x="${x - 4}" y="54" width="8" height="4" fill="#B8741A"/>`).join("") +
-      `<path d="M60 30c6 6 8 10 6 15-2 4-10 4-12 0-2-5 2-9 6-15z" fill="#FF9F1C"/><path d="M60 38c3 3 3 5 2 7-1 2-5 2-6 0-1-2 1-4 4-7z" fill="#FFF3A0"/>` +
-      `<path d="M44 52H76L72 58H48Z" fill="#B8741A"/>`),
-    mangal: svg("#FFD0DF", "#F48FB1",
-      `<rect x="0" y="7" width="120" height="5" fill="#B8324A"/><rect x="0" y="7" width="120" height="1.6" fill="#F2A900"/>` +
-      Array.from({ length: 12 }, (_, i) => { const x = 8 + i * 9.5; return `<path d="M${x} 12c-5 6-5 14 0 22 5-8 5-16 0-22z" fill="${i % 2 ? "#2F7A35" : "#4FA653"}"/>`; }).join("") +
-      Array.from({ length: 11 }, (_, i) => bloom(12.7 + i * 9.5, 39, 3.8, i % 2 ? "#FF9F1C" : "#FFC107", "#E4541B")).join("") +
-      `<path d="M40 56h40l-3 6H43z" fill="#F2A900"/><circle cx="60" cy="52" r="5" fill="#8C5A12"/><path d="M60 40c-6 4-8 8-5 11 3-1 5-5 5-11zm0 0c6 4 8 8 5 11-3-1-5-5-5-11z" fill="#4FA653"/>`)
-  };
-
-  /* Events + venues from CONFIG (Google Maps link only when an address exists) */
+  /* Function cards (poster image + details) and venue */
   const evBox = $("#eventList"), vBox = $("#venueList"); let day = 0;
   CONFIG.events.forEach(ev => {
     if (ev.day !== day) { day = ev.day; evBox.insertAdjacentHTML("beforeend", `<h3 class="day reveal">Day ${day} · ${ev.date.split(",")[0]}</h3>`); }
-    evBox.insertAdjacentHTML("beforeend", `<article class="ev ${ev.cls} reveal"><span class="ic"><img src="assets/${ev.cls}.png" data-k="${ev.cls}" alt=""></span><h3>${ev.name}</h3><p class="tg">${ev.tag}</p><p class="when"><b>${ev.date}</b><br>${ev.time}</p><p class="vn">Venue: ${CONFIG.venue}, Panvel, Navi Mumbai</p></article>`);
+    evBox.insertAdjacentHTML("beforeend", `<article class="ev ${ev.cls} reveal"><span class="ic"><img src="${ev.img}" alt="${ev.name} invitation illustration" loading="lazy"></span>
+      <div class="cap"><p class="tg">${ev.tag}</p><p class="when"><b>${ev.date}</b><br>${ev.time}</p><p class="vn">${CONFIG.venue}, Panvel, Navi Mumbai</p></div></article>`);
   });
-
-  evBox.addEventListener("error", e => { const k = e.target.dataset && e.target.dataset.k; if (k) e.target.parentNode.innerHTML = ICONS[k]; }, true);   // no PNG in assets/? use drawn cutout
-  $$("img[data-k]", evBox).forEach(i => { if (i.complete && !i.naturalWidth) i.parentNode.innerHTML = ICONS[i.dataset.k]; });
   const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(CONFIG.address);
   vBox.innerHTML = `<article class="v"><h3>${CONFIG.venue}</h3><p>Panvel, Navi Mumbai</p>
-    <ul class="vl">${CONFIG.events.map(ev => `<li class="${ev.cls}"><b>${ev.name}</b><span>${ev.date}, ${ev.time}</span></li>`).join("")}</ul>
+    <ul class="vl">${CONFIG.events.map(ev => `<li><b>${ev.name}</b><span>${ev.date}, ${ev.time}</span></li>`).join("")}</ul>
     <a class="dir" href="${url}" target="_blank" rel="noopener">Get Directions</a></article>`;
 
-  /* Scroll reveal (reveal elements added above are observed once the envelope opens) */
+  /* Scroll reveal */
   const io = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .15 }) : null;
   function observe(el) { io ? io.observe(el) : el.classList.add("in"); }
-
-  addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
-
-  /* RSVP names: CONFIG list + names saved in THIS browser only (no backend) */
-  const KEY = "wedding-rsvp-names"; let saved = [];
-  try { saved = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
-  const gl = $("#guestList");
-  function renderGuests() {
-    const all = [...new Set([...CONFIG.confirmedGuests, ...saved])];
-    gl.innerHTML = ""; all.forEach(n => { const li = document.createElement("li"); li.textContent = n; gl.appendChild(li); });
-    $("#guestEmpty").hidden = all.length > 0;
-  }
-  renderGuests();
-
-  /* RSVP (front-end demo: nothing is sent to a server) */
-  const form = $("#rsvpForm");
-  form.addEventListener("submit", e => {
-    e.preventDefault(); const f = new FormData(form), errs = {};
-    if (!f.get("name").trim()) errs.name = "Please enter your name.";
-    const c = f.get("contact").trim(); if (c && !/^\S+@\S+\.\S+$/.test(c) && !/^[+\d][\d\s-]{6,}$/.test(c)) errs.contact = "Enter a valid email or phone number, or leave it blank.";
-    const g = +f.get("guests"); if (!Number.isInteger(g) || g < 1 || g > 20) errs.guests = "Enter a number of guests from 1 to 20.";
-    if (!f.get("attend")) errs.attend = "Please choose Joyfully Accept or Regretfully Decline.";
-    $$(".err", form).forEach(el => el.textContent = errs[el.dataset.for] || "");
-    const first = Object.keys(errs)[0]; if (first) { form.elements[first].focus ? form.elements[first].focus() : form.elements[first][0].focus(); return; }
-    $("#rsvpMsg").textContent = f.get("attend") === "accept" ? `Thank you, ${f.get("name").trim()}! We can’t wait to celebrate with you (${g} guest${g > 1 ? "s" : ""}).` : `Thank you, ${f.get("name").trim()}. We’ll miss you and are grateful you let us know.`;
-    if (f.get("attend") === "accept") { saved.push(f.get("name").trim()); try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} renderGuests(); }
-    form.hidden = true; const ok = $("#rsvpOk"); ok.hidden = false; ok.focus(); confetti(ok);
-  });
 })();
