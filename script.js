@@ -10,10 +10,16 @@ const CONFIG = {
   seek: ["Mrs. Archana Khare", "Mr. Yash Khare & Mrs. Tulika Shrivastava", "Mr. Rakesh & Mrs. Rita Khare", "Mr. Akhilesh & Mrs. Neeta Khare", "Mr. Apoorv Khare"],
   venue: "Pushp Vatika Resort & Lawns", address: "Pushp Vatika Resort & Lawns, Panvel, Navi Mumbai",
   // img = poster image shown on the card (the title is already printed on each poster)
+  // Dress code wardrobe: one hanger per card (edit freely)
+  wardrobe: [
+    { day: 1, name: "Haldi",                 times: ["11:30 AM onwards"],                      dress: "Dress Code: Yellow with a Touch of Maharashtrian Tradition" },
+    { day: 1, name: "Sangeet",               times: ["7:00 PM onwards"],                       dress: "Dress Code: Western Elegance" },
+    { day: 2, name: "Phere & Mangalashtak",  times: ["Phere · 9:00 AM onwards","Mangalashtak · 11:30 AM"], dress: "Dress Code: Traditional Attire" }
+  ],
   events: [
-    { day: 1, cls: "haldi",   name: "Haldi",       img: "haldi_im.png",        tag: "The Golden Hour",     date: "Saturday, 27 February 2027", time: "11:30 AM onwards" },
-    { day: 1, cls: "sangeet", name: "Sangeet",     img: "sangeet_im.jpeg",      tag: "The Rhythm Soirée",   date: "Saturday, 27 February 2027", time: "7:00 PM onwards" },
-    { day: 2, cls: "phere",   name: "Phere",       img: "phere_im.png",        tag: "The Forever Chapter", date: "Sunday, 28 February 2027",   time: "9:00 AM onwards" },
+    { day: 1, cls: "haldi",   name: "Haldi",        img: "haldi_im.png",         tag: "The Golden Hour",     date: "Saturday, 27 February 2027", time: "11:30 AM onwards" },
+    { day: 1, cls: "sangeet", name: "Sangeet",      img: "sangeet_im.jpeg",      tag: "The Rhythm Soirée",   date: "Saturday, 27 February 2027", time: "7:00 PM onwards" },
+    { day: 2, cls: "phere",   name: "Phere",        img: "phere_im.png",         tag: "The Forever Chapter", date: "Sunday, 28 February 2027",   time: "9:00 AM onwards" },
     { day: 2, cls: "mangal",  name: "Mangalashtak", img: "mangalashtak_im.jpeg", tag: "The Floral Promise",  date: "Sunday, 28 February 2027",   time: "11:30 AM" }
   ]
 };
@@ -58,8 +64,12 @@ const CONFIG = {
 
   env.addEventListener("click", () => {
     if (opened) return; opened = true;
-    env.classList.add("open"); env.disabled = true; startMusic();
-    setTimeout(() => { intro.classList.add("done"); startInvited(); setTimeout(() => { intro.hidden = true; }, 1100); }, reduce ? 300 : 2300);
+    env.classList.add("open"); env.disabled = true; startMusic(); intro.classList.add("opened");
+    const sp = $("#cardSparks"); if (!reduce) {
+      for (let i = 0; i < 70; i++) { const d = document.createElement("i"); d.className = "rs"; d.style.cssText = `left:${Math.random() * 100}%;top:${45 + Math.random() * 55}%;--d:${1.6 + Math.random() * 2}s;--dl:${.3 + Math.random() * 2.6}s;--h:${80 + Math.random() * 160}px;width:${2 + Math.random() * 5}px;height:${2 + Math.random() * 5}px`; sp.appendChild(d); }
+      for (let i = 0; i < 12; i++) { const d = document.createElement("i"); d.className = "bk"; const z = 18 + Math.random() * 34; d.style.cssText = `left:${Math.random() * 100}%;top:${40 + Math.random() * 50}%;--d:${4 + Math.random() * 3}s;--dl:${Math.random() * 3}s;--h:${120 + Math.random() * 140}px;width:${z}px;height:${z}px`; sp.appendChild(d); }
+    }
+    setTimeout(() => { intro.classList.add("done"); startInvited(); setTimeout(() => { intro.hidden = true; }, 1100); }, reduce ? 300 : 0);
   });
 
   function startInvited() {
@@ -161,8 +171,14 @@ const CONFIG = {
       <div class="cap"><p class="tg">${ev.tag}</p><p class="when"><b>${ev.date}</b><br>${ev.time}</p><p class="vn">${CONFIG.venue}, Panvel, Navi Mumbai</p></div></article>`);
   });
   const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(CONFIG.address);
+  const HANGER = '<svg class="hk" viewBox="0 -1 60 33" aria-hidden="true"><path d="M30 16V12C30 8 36 8 36 5A5 5 0 0 0 26 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M30 16 3 29Q1 31 4 31H56Q59 31 57 29Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg>';
+  const days = [...new Set(CONFIG.wardrobe.map(e => e.day))];
+  const dayName = d => CONFIG.events.find(e => e.day === d).date.split(",")[0];
+  const shelves = days.map(d => { const es = CONFIG.wardrobe.filter(e => e.day === d);
+    return `<div class="shelf reveal"><span class="shelf-day">Day ${d} · ${dayName(d)}</span><div class="rail${es.length === 1 ? " one" : ""}">${es.map(ev => `<div class="hg">${HANGER}<div class="hg-card"><b>${ev.name}</b>${ev.times.map(t => `<span class="hg-t">${t}</span>`).join("")}<p class="hg-d">${ev.dress}</p></div></div>`).join("")}</div></div>`; }).join("");
   vBox.innerHTML = `<article class="v"><h3>${CONFIG.venue}</h3><p>Panvel, Navi Mumbai</p>
-    <ul class="vl">${CONFIG.events.map(ev => `<li><b>${ev.name}</b><span>${ev.date}, ${ev.time}</span></li>`).join("")}</ul>
+    <p class="wd-head">The Wardrobe · Dress Code</p>
+    <div class="wd">${shelves}</div>
     <a class="dir" href="${url}" target="_blank" rel="noopener">Get Directions</a></article>`;
 
   /* Scroll reveal */
